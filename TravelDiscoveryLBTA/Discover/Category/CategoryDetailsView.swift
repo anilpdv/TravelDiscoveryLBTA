@@ -16,7 +16,7 @@ class CategoryDetailsViewModel: ObservableObject {
 
     init(name: String) {
         let urlString = "https://travel.letsbuildthatapp.com/travel_discovery/category?name=\(name.lowercased())".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-        guard let url = URL(string: urlString ) else { return }
+        guard let url = URL(string: urlString) else { return }
 
         URLSession.shared.dataTask(with: url) { data, resp, error in
             if let statusCode = (resp as? HTTPURLResponse)?.statusCode, statusCode >= 400 {

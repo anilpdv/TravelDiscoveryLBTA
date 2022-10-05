@@ -61,7 +61,38 @@ struct PopularDestinationsView: View {
     }
 }
 
+struct DestinationDetails: Decodable {
+    let description: String
+    let photos: [String]
+}
+
+class DestinationDetailsViewModel: ObservableObject {
+    @Published var loading = false
+    @Published var destinationDetails: DestinationDetails?
+
+    init(name: String) {
+        let urlString = "https://travel.letsbuildthatapp.com/travel_discovery/destination?name=\(name.lowercased())".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+
+        guard let url = URL(string: urlString) else { return }
+
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            DispatchQueue.main.async {
+                guard let data = data else { return }
+                print(String(data: data, encoding: .utf8) as Any)
+
+                do {
+                    self.destinationDetails = try JSONDecoder().decode(DestinationDetails.self, from: data)
+                } catch {
+                    print("Failed to decode JSON", error)
+                }
+            }
+
+        }.resume()
+    }
+}
+
 struct PopularDestinationDetailsView: View {
+    @ObservedObject var vm: DestinationDetailsViewModel
     let destination: Destination
     let attractions: [Attraction] = [
         .init(name: "Effiel Tower", latitude: 48.859565, longitude: 2.353235),
@@ -72,12 +103,16 @@ struct PopularDestinationDetailsView: View {
     init(destination: Destination) {
         self.destination = destination
         region = MKCoordinateRegion(center: .init(latitude: destination.latitude, longitude: destination.longitude), span: .init(latitudeDelta: 0.3, longitudeDelta: 0.3))
+        vm = .init(name: destination.name)
     }
 
     var body: some View {
         ScrollView {
-            DestinationHeaderView()
-                .scaledToFit()
+            if let photos = vm.destinationDetails?.photos {
+                DestinationHeaderView(imageNames: photos)
+                    .scaledToFit()
+            }
+
             VStack(alignment: .leading) {
                 Text(destination.name)
                     .font(.system(size: 20, weight: .bold))
