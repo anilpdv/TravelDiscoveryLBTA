@@ -1,18 +1,19 @@
 //
-//  DestinationHeaderView.swift
+//  RestaurantCarouselView.swift
 //  TravelDiscoveryLBTA
 //
-//  Created by anilpdv on 30/09/22.
+//  Created by anilpdv on 07/10/22.
 //
 
 import Kingfisher
 import SwiftUI
 
-struct DestinationHeaderView: UIViewControllerRepresentable {
+struct RestaurantCarouselView: UIViewControllerRepresentable {
     let imageNames: [String]
+    let selectedIndex: Int
 
     func makeUIViewController(context: Context) -> UIViewController {
-        let redVC = CustomPageViewController(imageNames: imageNames)
+        let redVC = RestuarantCarouselPageViewController(imageNames: imageNames, selectedIndex: selectedIndex)
 
         return redVC
     }
@@ -23,13 +24,13 @@ struct DestinationHeaderView: UIViewControllerRepresentable {
     typealias UIViewControllerType = UIViewController
 }
 
-class CustomPageViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+class RestuarantCarouselPageViewController: UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate {
     func presentationCount(for pageViewController: UIPageViewController) -> Int {
         allControllers.count
     }
 
     func presentationIndex(for pageViewController: UIPageViewController) -> Int {
-        0
+        selectedIndex
     }
 
     func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
@@ -47,24 +48,27 @@ class CustomPageViewController: UIPageViewController, UIPageViewControllerDataSo
     }
 
     lazy var allControllers: [UIViewController] = []
-
-    init(imageNames: [String]) {
+    var selectedIndex: Int
+    init(imageNames: [String], selectedIndex: Int) {
+        self.selectedIndex = selectedIndex
         UIPageControl.appearance().pageIndicatorTintColor = UIColor.systemGray5
         UIPageControl.appearance().currentPageIndicatorTintColor = .red
         super.init(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
 
         allControllers = imageNames.map({
             imageName in
-            let hostingController = UIHostingController(rootView:
+            let hostingController = UIHostingController(rootView: ZStack {
+                Color.black
                 KFImage(URL(string: imageName)!)
                     .resizable()
                     .scaledToFit()
+            }
             )
             return hostingController
         })
 
-        if let first = allControllers.first {
-            setViewControllers([first], direction: .forward, animated: true)
+        if selectedIndex < allControllers.count {
+            setViewControllers([allControllers[selectedIndex]], direction: .forward, animated: true)
         }
 
         dataSource = self
@@ -76,8 +80,8 @@ class CustomPageViewController: UIPageViewController, UIPageViewControllerDataSo
     }
 }
 
-struct DestinationHeaderView_Previews: PreviewProvider {
+struct RestaurantCarouselView_Previews: PreviewProvider {
     static var previews: some View {
-        DestinationHeaderView(imageNames: ["eiffel_tower", "art1", "art2"])
+        RestaurantCarouselView(imageNames: [], selectedIndex: 5)
     }
 }

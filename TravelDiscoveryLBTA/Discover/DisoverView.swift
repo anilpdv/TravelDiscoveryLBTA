@@ -7,6 +7,11 @@
 
 import SwiftUI
 
+extension Color {
+    static let defaultBackground = Color("defaultBackground")
+    static let tileBackground = Color("tileBackground")
+}
+
 struct DisoverView: View {
     init() {
         UINavigationBar.appearance().largeTitleTextAttributes = [
@@ -41,7 +46,7 @@ struct DisoverView: View {
                         PopularRestaurantsView()
                         PopularCreatorsView()
                     }
-                    .background(Color(.init(white: 0.95, alpha: 1)))
+                    .background(Color.defaultBackground)
                     .cornerRadius(18)
                     .padding(.top, 32)
                 }
@@ -53,6 +58,6 @@ struct DisoverView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        DisoverView()
+        DisoverView().colorScheme(.dark)
     }
 }

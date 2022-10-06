@@ -75,7 +75,7 @@ struct RestaurantDetails: View {
                     }.padding()
 
                     Spacer()
-                    NavigationLink(destination: RestaurantPhotoView()) {
+                    NavigationLink(destination: RestaurantPhotoView(photos: vm.details?.photos ?? [])) {
                         Text("see more photos")
                             .foregroundColor(.white)
                             .font(.system(size: 18, weight: .regular))
